@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export PATH=/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin:/opt/homebrew/bin
 
 results=$(sunrise-sunset 2>&1)
 if [[ $? != 0 ]] || ! echo "$results" | grep -q '"sunrise":' ; then
