@@ -11,17 +11,31 @@ fi
 # for_date=$(echo "$results" | jq -r .for_date)
 message=$(echo "$results" | jq '{sunrise: .sunrise, sunset: .sunset}')
 
+auth1=SET_ME
+auth2=SET_ME
+
+echo "$auth1" | fgrep -q SET_ME || echo "$auth2" | fgrep -q SET_ME && {
+  echo 1>&2 "fatal: set real values for \$auth1 and \$auth2"
+  exit 1
+}
+
+recipient_email=SET_ME
+echo "$recipient_email" | fgrep -q SET_ME && {
+  echo 1>&2 "fatal: set real value for \$recipient_email"
+  exit 1
+}
+
 openssl s_client -crlf -quiet -starttls smtp -connect email-smtp.us-west-2.amazonaws.com:587 < <(
   cat << _END_OF_BODY_
 EHLO example.com
 AUTH LOGIN
-QUt[...redacted...]V1E=
-Qkg[...redacted...]KzM=
-MAIL FROM: [...redacted...]
-RCPT TO: [...redacted...]
+$auth1
+$auth2
+MAIL FROM: $recipient_email
+RCPT TO: $recipient_email
 DATA
-From: sunrise-sunet <[...redacted...]>
-To: [...redacted...]
+From: sunrise-sunset <$recipient_email>
+To: $recipient_email
 Subject: Sunrise / sunset
 
 $message
