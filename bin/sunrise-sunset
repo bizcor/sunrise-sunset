@@ -1,0 +1,47 @@
+#!/usr/bin/env ruby
+
+require 'date'
+require 'json'
+require 'time'
+
+MY_DATE_PARAMETER = 'today'
+MY_LATITUDE = '37.780430'
+MY_LONGITUDE = '-122.414464'
+MY_TIMEZONE = 'PST8PDT'
+
+ENV['TZ'] = MY_TIMEZONE
+
+RFC399_REGEX = %r{^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})([-+])(\d{2}):(\d{2})$}
+
+# if i want to change the date, here's the expected format:   &date=1990-05-22
+results = %x{curl -s 'https://api.sunrise-sunset.org/json?lat=#{MY_LATITUDE}&lng=#{MY_LONGITUDE}&formatted=0&date=#{MY_DATE_PARAMETER}'}
+
+data = JSON.parse results
+
+sunrise_utc = data['results']['sunrise']    # 2023-01-01T15:23:35+00:00
+sunset_utc = data['results']['sunset']
+
+sunrise_utc =~ RFC399_REGEX
+y = $1 ; mo = $2 ; d = $3 ; h = $4 ; m = $5 ; s = $6 ; sign = $7 ; z = $8
+t_sunrise = Time.utc(y, mo, d, h, m, s)
+sunrise_localtime = t_sunrise.localtime
+
+sunset_utc =~ RFC399_REGEX
+y = $1 ; mo = $2 ; d = $3 ; h = $4 ; m = $5 ; s = $6 ; sign = $7 ; z = $8
+t_sunset = Time.utc(y, mo, d, h, m, s)
+sunset_localtime = t_sunset.localtime
+
+sunrise_localtime.to_s =~ %r{^(\d{4}-\d{2}-\d{2})}
+for_date = $1
+
+to_print = {
+  'sunrise' => sunrise_localtime,
+  'sunset' => sunset_localtime,
+  'for_date' => for_date,
+  # 'now' => Time.now.to_s,
+  # 'date_parameter' => MY_DATE_PARAMETER,
+}
+
+puts JSON.generate to_print
+
+exit 0

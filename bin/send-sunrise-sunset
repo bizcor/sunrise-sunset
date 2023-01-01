@@ -1,0 +1,33 @@
+#!/bin/bash
+
+export PATH=/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin
+
+results=$(sunrise-sunset 2>&1)
+if [[ $? != 0 ]] || ! echo "$results" | grep -q '"sunrise":' ; then
+  echo 1>&2 "${0##*/}: output from sunrise-sunset doesn't seem right: $results"
+  exit 1
+fi
+
+# for_date=$(echo "$results" | jq -r .for_date)
+message=$(echo "$results" | jq '{sunrise: .sunrise, sunset: .sunset}')
+
+openssl s_client -crlf -quiet -starttls smtp -connect email-smtp.us-west-2.amazonaws.com:587 < <(
+  cat << _END_OF_BODY_
+EHLO example.com
+AUTH LOGIN
+QUt[...redacted...]V1E=
+Qkg[...redacted...]KzM=
+MAIL FROM: [...redacted...]
+RCPT TO: [...redacted...]
+DATA
+From: sunrise-sunet <[...redacted...]>
+To: [...redacted...]
+Subject: Sunrise / sunset
+
+$message
+.
+QUIT
+_END_OF_BODY_
+)
+
+exit 0
