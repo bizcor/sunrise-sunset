@@ -37,7 +37,7 @@ RCPT TO: $recipient_email
 DATA
 From: sunrise-sunset <$recipient_email>
 To: $recipient_email
-Subject: $for_date --- rise: $sunrise --- set: $sunset
+Subject: $for_date --- sunrise: $sunrise --- sunset: $sunset
 
 .
 QUIT
