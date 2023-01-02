@@ -8,8 +8,9 @@ if [[ $? != 0 ]] || ! echo "$results" | grep -q '"sunrise":' ; then
   exit 1
 fi
 
-# for_date=$(echo "$results" | jq -r .for_date)
-message=$(echo "$results" | jq '{sunrise: .sunrise, sunset: .sunset}')
+sunrise=$(echo "$results" | jq -r .sunrise | awk '{print $2}' | cut -f1-2 -d:)
+sunset=$(echo "$results" | jq -r .sunset | awk '{print $2}' | cut -f1-2 -d:)
+for_date=$(echo "$results" | jq -r .for_date)
 
 auth1=SET_ME
 auth2=SET_ME
@@ -36,9 +37,8 @@ RCPT TO: $recipient_email
 DATA
 From: sunrise-sunset <$recipient_email>
 To: $recipient_email
-Subject: Sunrise / sunset
+Subject: $for_date --- rise: $sunrise --- set: $sunset
 
-$message
 .
 QUIT
 _END_OF_BODY_
