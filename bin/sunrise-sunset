@@ -4,10 +4,19 @@ require 'date'
 require 'json'
 require 'time'
 
-MY_DATE_PARAMETER = 'today'
+DEFAULT_MY_DATE_PARAMETER = 'today'
 MY_LATITUDE = '37.780430'
 MY_LONGITUDE = '-122.414464'
 MY_TIMEZONE = 'PST8PDT'
+
+user_date = ARGV[0]
+MY_DATE_PARAMETER = if user_date.nil?
+                      DEFAULT_MY_DATE_PARAMETER
+                    elsif user_date == 'tomorrow'
+                      (DateTime.now+1).to_s[0..9]
+                    else
+                      ARGV[0]
+                    end
 
 ENV['TZ'] = MY_TIMEZONE
 
