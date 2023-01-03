@@ -2,7 +2,7 @@
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin:/opt/homebrew/bin
 
-results=$(sunrise-sunset 2>&1)
+results=$(sunrise-sunset tomorrow 2>&1)
 if [[ $? != 0 ]] || ! echo "$results" | grep -q '"sunrise":' ; then
   echo 1>&2 "${0##*/}: output from sunrise-sunset doesn't seem right: $results"
   exit 1
