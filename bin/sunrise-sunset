@@ -15,7 +15,7 @@ MY_DATE_PARAMETER = if user_date.nil?
                     elsif user_date == 'tomorrow'
                       (DateTime.now+1).to_s[0..9]
                     else
-                      ARGV[0]
+                      'today'
                     end
 
 ENV['TZ'] = MY_TIMEZONE
