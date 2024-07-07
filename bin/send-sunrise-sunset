@@ -15,8 +15,8 @@ sunrise=$(echo "$results" | jq -r .sunrise | awk '{print $2}' | cut -f1-2 -d:)
 sunset=$(echo "$results" | jq -r .sunset | awk '{print $2}' | cut -f1-2 -d:)
 for_date=$(echo "$results" | jq -r .for_date)
 
-auth1=SET_ME
-auth2=SET_ME
+auth1=DO_NOT_SET_THIS_VALUE_IN_GIT
+auth2=DO_NOT_SET_THIS_VALUE_IN_GIT
 
 echo "$auth1" | fgrep -q SET_ME || echo "$auth2" | fgrep -q SET_ME && {
   echo 1>&2 "fatal: set real values for \$auth1 and \$auth2"
