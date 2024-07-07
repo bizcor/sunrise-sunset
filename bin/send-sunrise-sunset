@@ -2,6 +2,9 @@
 
 export PATH=/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin:/opt/homebrew/bin
 
+export TZ=PST8PDT
+program_invoked=$(date '+%Y-%m-%d %H:%M:%S %z')
+
 results=$(sunrise-sunset 2>&1)
 if [[ $? != 0 ]] || ! echo "$results" | grep -q '"sunrise":' ; then
   echo 1>&2 "${0##*/}: output from sunrise-sunset doesn't seem right: $results"
@@ -20,11 +23,8 @@ echo "$auth1" | fgrep -q SET_ME || echo "$auth2" | fgrep -q SET_ME && {
   exit 1
 }
 
-recipient_email=SET_ME
-echo "$recipient_email" | fgrep -q SET_ME && {
-  echo 1>&2 "fatal: set real value for \$recipient_email"
-  exit 1
-}
+sender=extasia@extasia.org
+recipient_email=extasia@gmail.com
 
 openssl s_client -crlf -quiet -starttls smtp -connect email-smtp.us-west-2.amazonaws.com:587 < <(
   cat << _END_OF_BODY_
@@ -32,12 +32,14 @@ EHLO example.com
 AUTH LOGIN
 $auth1
 $auth2
-MAIL FROM: $recipient_email
+MAIL FROM: $sender
 RCPT TO: $recipient_email
 DATA
-From: sunrise-sunset <$recipient_email>
+From: sunrise-sunset <$sender>
 To: $recipient_email
 Subject: $for_date --- sunrise: $sunrise --- sunset: $sunset
+
+invoked: $program_invoked
 
 .
 QUIT
