@@ -1,9 +1,6 @@
 #!/bin/bash
 
-export PATH=/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin:/opt/homebrew/bin
-
-export TZ=PST8PDT
-program_invoked=$(date '+%Y-%m-%d %H:%M:%S %z')
+export PATH=$HOME/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 results=$(sunrise-sunset 2>&1)
 if [[ $? != 0 ]] || ! echo "$results" | grep -q '"sunrise":' ; then
@@ -15,35 +12,13 @@ sunrise=$(echo "$results" | jq -r .sunrise | awk '{print $2}' | cut -f1-2 -d:)
 sunset=$(echo "$results" | jq -r .sunset | awk '{print $2}' | cut -f1-2 -d:)
 for_date=$(echo "$results" | jq -r .for_date)
 
-auth1=DO_NOT_SET_THIS_VALUE_IN_GIT
-auth2=DO_NOT_SET_THIS_VALUE_IN_GIT
-
 echo "$auth1" | fgrep -q SET_ME || echo "$auth2" | fgrep -q SET_ME && {
   echo 1>&2 "fatal: set real values for \$auth1 and \$auth2"
   exit 1
 }
 
-sender=extasia@extasia.org
-recipient_email=extasia@gmail.com
+subject="$for_date --- sunrise: $sunrise --- sunset: $sunset"
 
-openssl s_client -crlf -quiet -starttls smtp -connect email-smtp.us-west-2.amazonaws.com:587 < <(
-  cat << _END_OF_BODY_
-EHLO example.com
-AUTH LOGIN
-$auth1
-$auth2
-MAIL FROM: $sender
-RCPT TO: $recipient_email
-DATA
-From: sunrise-sunset <$sender>
-To: $recipient_email
-Subject: $for_date --- sunrise: $sunrise --- sunset: $sunset
-
-invoked: $program_invoked
-
-.
-QUIT
-_END_OF_BODY_
-)
+send-email "$subject" <(echo null)
 
 exit 0
