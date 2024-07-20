@@ -19,6 +19,6 @@ echo "$auth1" | fgrep -q SET_ME || echo "$auth2" | fgrep -q SET_ME && {
 
 subject="$for_date --- sunrise: $sunrise --- sunset: $sunset"
 
-send-email "$subject" <(echo null)
+send-email --full-name ::sunny "$subject" <(echo null)
 
 exit 0
